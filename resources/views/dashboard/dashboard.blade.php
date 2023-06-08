@@ -7,7 +7,7 @@
             </div>
             <div id="user-info">
                 <h2 id="user-name">M Muslim Abdul J</h2>
-                <span id="user-role">Head of IT</span>
+                <span id="user-role">Teknik Informatika</span>
             </div>
         </div>
     </div>

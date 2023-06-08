@@ -39,10 +39,17 @@
     </div>
     <div class="row">
         <div class="col">
-            <button id="takeabsen" class="btn btn-primary btn-block">
-                <ion-icon name="camera-outline"></ion-icon>
-                Absen Masuk
-            </button>
+            @if ($cek > 0)
+                <button id="takeabsen" class="btn btn-danger btn-block">
+                    <ion-icon name="camera-outline"></ion-icon>
+                    Absen Pulang
+                </button>
+            @else
+                <button id="takeabsen" class="btn btn-primary btn-block">
+                    <ion-icon name="camera-outline"></ion-icon>
+                    Absen Masuk
+                </button>
+            @endif
         </div>
     </div>
     <div class="row mt-2">
@@ -50,9 +57,21 @@
             <div id="map"></div>
         </div>
     </div>
+    <audio id="notifikasi_in">
+        <source src="{{ asset('assets/audio/notifikasi_in.mp3') }}" type="audio/mpeg">
+    </audio>
+    <audio id="notifikasi_out">
+        <source src="{{ asset('assets/audio/notifikasi_out.mp3') }}" type="audio/mpeg">
+    </audio>
+    <audio id="notifikasi_radius">
+        <source src="{{ asset('assets/audio/notifikasi_radius.mp3') }}" type="audio/mpeg">
+    </audio>
 @endsection
 @push('myscript')
     <script>
+        var notifikasi_in = document.getElementById('notifikasi_in');
+        var notifikasi_out = document.getElementById('notifikasi_out');
+        var notifikasi_radius = document.getElementById('notifikasi_radius');
         Webcam.set({
             height: 480,
             width: 640,
@@ -74,7 +93,7 @@
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map);
             var marker = L.marker([position.coords.latitude, position.coords.longitude]).addTo(map);
-            var circle = L.circle([position.coords.latitude, position.coords.longitude], {
+            var circle = L.circle([-6.836980232645298, 107.18892648470208], {
                 color: 'red',
                 fillColor: '#f03',
                 fillOpacity: 0.5,
@@ -100,17 +119,24 @@
                 },
                 cache: false,
                 success: function(respond) {
-                    if (respond == 0) {
+                    var status = respond.split('|');
+                    if (status[0] == 'success') {
+                        if (status[2] == 'in') {
+                            notifikasi_in.play();
+                        } else {
+                            notifikasi_out.play();
+                        }
                         Swal.fire({
                             title: 'Berhasil!',
-                            text: 'Presensi sudah terekam',
+                            text: status[1],
                             icon: 'success'
                         })
                         setTimeout("location.href='/dashboard'", 3000);
                     } else {
+                        notifikasi_radius.play();
                         Swal.fire({
                             title: 'Error',
-                            text: 'Presensi gagal terekam',
+                            text: status[1],
                             icon: 'error',
                         })
                     }
